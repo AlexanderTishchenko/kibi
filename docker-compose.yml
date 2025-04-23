@@ -32,7 +32,10 @@ services:
     build:
       context: .
       dockerfile: apps/web/Dockerfile
+    working_dir: /usr/src/apps/web
     command: pnpm dev
+    volumes:
+      - ./apps/web:/usr/src/apps/web
     ports:
       - '3000:3000'
     environment:

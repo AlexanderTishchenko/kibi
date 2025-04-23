@@ -18,10 +18,10 @@ export default function DashboardPage() {
   React.useEffect(() => {
     if (!loading && !user) router.replace('/login');
   }, [user, loading, router]);
+  const [tab, setTab] = React.useState<'my' | 'recommended'>('my');
+
   if (loading) return <div>Loading...</div>;
   if (!user) return null;
-
-  const [tab, setTab] = React.useState<'my' | 'recommended'>('my');
 
   const myWorkflows = [
     { id: 1, title: 'Client Onboarding', rating: 5, category: 'Client Management', description: 'Automate onboarding emails and contract signing', timeSaved: 3.5, credits: 5 },
