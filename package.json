@@ -1,0 +1,11 @@
+{
+  "name": "kibi-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "make dev",
+    "lint": "make lint",
+    "test": "make test",
+    "db_migrate": "docker-compose run --rm api alembic upgrade head"
+  }
+}
