@@ -5,4 +5,4 @@ from sqlalchemy import create_engine
 
 database = Database(settings.DATABASE_URL)
 metadata = sqlalchemy.MetaData()
-engine = create_engine(settings.DATABASE_URL)
+engine = create_engine(settings.DATABASE_URL, connect_args={"sslmode": "require"})

@@ -13,10 +13,12 @@ class Settings(BaseSettings):
     SUPABASE_ANON_KEY: str
     STRIPE_SECRET_KEY: str
     STRIPE_PUBLISHABLE_KEY: str
+    FRONTEND_URL: str
     MAKE_WEBHOOK_TOKEN: str
     OPENAI_API_KEY: str
     RESEND_API_KEY: str
     SUPABASE_JWT_SECRET: str
+    STRIPE_WEBHOOK_SECRET: str
 
     class Config:
         env_file = ".env"

@@ -4,8 +4,22 @@ from prometheus_fastapi_instrumentator import Instrumentator
 from app.db import database
 from app.api.v1 import auth, automations, credits, payments, webhook_make
 import logging
+from fastapi.middleware.cors import CORSMiddleware
+
 logging.basicConfig(level=logging.INFO)
 app = FastAPI(title="Kibi API")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",
+        "http://localhost:8000",
+        "http://localhost:8001",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.on_event("startup")
 async def startup():
@@ -15,8 +29,8 @@ async def startup():
 async def shutdown():
     await database.disconnect()
 
-@app.get("/healthz")
-def healthz():
+@app.get("/health")
+def health():
     return {"status": "ok"}
 
 app.include_router(auth.router, prefix="/v1/auth", tags=["auth"])

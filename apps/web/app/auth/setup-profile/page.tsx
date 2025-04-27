@@ -56,6 +56,12 @@ export default function SetupProfile() {
         return router.replace(`${window.location.origin}/error`);
       }
 
+      // if profile already exists, just continue
+      if (response.status === 409) {
+        console.warn('[setup-profile] profile already exists, proceeding');
+        return router.replace(next);
+      }
+
       if (!response.ok) {
         const text = await response.text();
         console.error('[setup-profile] failed to create profile:', text);

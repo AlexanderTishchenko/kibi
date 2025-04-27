@@ -15,4 +15,5 @@ async def get_credits(user: dict = Depends(get_current_user)):
     record = await database.fetch_one(query)
     if not record:
         return CreditResponse(credits=0)
-    return CreditResponse(credits=record.get("credits", 0))
+    # Record does not support .get; use direct indexing
+    return CreditResponse(credits=record["credits"])

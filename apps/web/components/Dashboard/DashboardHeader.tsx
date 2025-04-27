@@ -1,8 +1,11 @@
+//apps/web/components/Dashboard/DashboardHeader.tsx
 "use client";
 import React, { useState, useRef, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Button } from "@/components/ui/button";
 import { Bell, Settings, Search } from "lucide-react";
 import CreditsBadge from './CreditsBadge';
+import BuyCreditsModal from '../BuyCreditsModal';
 import HourglassIcon from '../ui/HourglassIcon';
 import useLogout from '@/hooks/useLogout';
 
@@ -13,6 +16,16 @@ interface DashboardHeaderProps {
 
 const DashboardHeader: React.FC<DashboardHeaderProps> = ({ username, credits }) => {
   const [menuOpen, setMenuOpen] = useState(false);
+  // Fetch latest credits from local API (overrides prop)
+  const { data: balance = credits } = useQuery<number, Error>({
+    queryKey: ['credits'],
+    queryFn: async () => {
+      const res = await fetch('/api/me/credits');
+      if (!res.ok) throw new Error('Failed fetching credits');
+      const json = await res.json();
+      return json.credits as number;
+    },
+  });
   const logout = useLogout();
   const wrapperRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -49,7 +62,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({ username, credits }) 
           />
         </div>
         
-        <CreditsBadge credits={credits} />
+        <BuyCreditsModal trigger={<CreditsBadge credits={balance} />} />
         
         <Button variant="outline" size="icon" className="rounded-full">
           <Bell className="h-5 w-5 text-muted-foreground" />

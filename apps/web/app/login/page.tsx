@@ -6,7 +6,8 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams } from "next/navigation";
 import { login, signup } from './actions';
 import { createClient } from "@/utils/supabase/client";
-
+import { Button } from "@/components/ui/button";
+import type { SVGProps } from "react";
 
 export default function LoginPage() {
   //const { user, loading, signIn, signInWithGoogle } = useAuth();
@@ -84,18 +85,18 @@ export default function LoginPage() {
             required
           />
           <div className="flex gap-2">
-          <button
+          <Button
             formAction={login}
             className="w-1/2 bg-green-500 text-white py-2 rounded hover:bg-green-600/90"
           >
             Log In
-          </button>
-          <button
+          </Button>
+          <Button
             formAction={signup}
-            className="w-1/2 bg-primary-blue text-white py-2 rounded hover:bg-primary-blue/90"
+            className="w-1/2 bg-primary text-white py-2 rounded hover:bg-primary-blue/90"
           >
             Sign Up
-          </button>
+          </Button>
           </div>
         </form>
         <div className="mt-4">
@@ -105,8 +106,10 @@ export default function LoginPage() {
             className="w-full flex justify-center border border-gray-200 rounded py-2 hover:bg-gray-50"
           >
             {isGoogleLoading ? "Loading..." : (
-          <GoogleIcon />
-        )}
+              <>
+                Sign in with Google <GoogleIcon className="w-5 h-5 ml-2" />
+              </>
+            )}
           </button>
         </div>
       </div>
@@ -114,7 +117,7 @@ export default function LoginPage() {
   );
 }
 
-const GoogleIcon = () => (
+const GoogleIcon = (props: SVGProps<SVGSVGElement>) => (
   <svg
     aria-hidden="true"
     focusable="false"
@@ -122,6 +125,7 @@ const GoogleIcon = () => (
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 48 48"
     className="size-5"
+    {...props}
   >
     <path
       fill="#fbc02d"

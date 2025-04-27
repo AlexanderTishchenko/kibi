@@ -10,7 +10,12 @@ export async function GET(req: NextRequest) {
     { status: 401 }
   )
 
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/credits`, {
+  // If using localhost in NEXT_PUBLIC_API_URL, switch to the Docker service hostname 'api'
+  let apiBase = process.env.NEXT_PUBLIC_API_URL!
+  if (apiBase.includes('localhost')) {
+    apiBase = apiBase.replace('localhost', 'api')
+  }
+  const res = await fetch(`${apiBase}/v1/credits`, {
     headers: { Authorization: `Bearer ${session.access_token}` },
     cache: 'no-store',
   })
