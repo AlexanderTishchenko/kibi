@@ -50,7 +50,6 @@
     "react-dom": "18.2.0",
     "react-hook-form": "^7.56.1",
     "react-resizable-panels": "^2.1.8",
-    "react-router-dom": "^7.5.2",
     "recharts": "^2.15.3",
     "sonner": "^2.0.3",
     "tailwind-merge": "^3.2.0",
@@ -59,6 +58,7 @@
   "devDependencies": {
     "autoprefixer": "^10.4.21",
     "postcss": "^8.5.3",
+    "supabase": "^2.22.6",
     "tailwindcss": "^3.4.17",
     "tailwindcss-animate": "^1.0.7"
   }

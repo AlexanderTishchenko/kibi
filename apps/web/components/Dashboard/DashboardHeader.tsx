@@ -1,9 +1,10 @@
-
-import React from 'react';
+"use client";
+import React, { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Bell, Settings, Search } from "lucide-react";
 import CreditsBadge from './CreditsBadge';
 import HourglassIcon from '../ui/HourglassIcon';
+import useLogout from '@/hooks/useLogout';
 
 interface DashboardHeaderProps {
   username: string;
@@ -11,6 +12,19 @@ interface DashboardHeaderProps {
 }
 
 const DashboardHeader: React.FC<DashboardHeaderProps> = ({ username, credits }) => {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const logout = useLogout();
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   return (
     <header className="flex flex-col md:flex-row items-center justify-between pb-6 border-b mb-8">
       <div className="flex items-center gap-3 mb-4 md:mb-0">
@@ -41,9 +55,21 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({ username, credits }) 
           <Bell className="h-5 w-5 text-muted-foreground" />
         </Button>
         
-        <Button variant="outline" size="icon" className="rounded-full">
-          <Settings className="h-5 w-5 text-muted-foreground" />
-        </Button>
+        <div className="relative" ref={wrapperRef}>
+          <Button variant="outline" size="icon" className="rounded-full" onClick={() => setMenuOpen(!menuOpen)}>
+            <Settings className="h-5 w-5 text-muted-foreground" />
+          </Button>
+          {menuOpen && (
+            <div className="absolute right-0 mt-2 w-32 bg-white border rounded shadow-lg z-10">
+              <button
+                onClick={() => { logout(); setMenuOpen(false); }}
+                className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
+              >
+                Log out
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </header>
   );
