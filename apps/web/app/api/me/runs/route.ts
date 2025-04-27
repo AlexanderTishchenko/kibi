@@ -1,12 +1,25 @@
-import { NextResponse } from 'next/server';
+// apps/web/app/api/me/runs/route.ts
+import { NextResponse, NextRequest } from 'next/server';
+import { createClient } from '@/utils/supabase/server';
 
-export async function GET(req: Request) {
-  const token = req.headers.get('authorization') ?? '';
+export async function GET(req: NextRequest) {
+  const supabase = await createClient();
+  const { data: { session }, error } = await supabase.auth.getSession();
+  if (error || !session) return NextResponse.json(
+    { error: 'Not authenticated' },
+    { status: 401 }
+  )
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/automations/runs`, {
-    headers: { Authorization: token },
+    headers: { Authorization: `Bearer ${session.access_token}` },
     cache: 'no-store',
   });
-  if (!res.ok) return NextResponse.error();
+  if (!res.ok) {
+    const text = await res.text()
+    return NextResponse.json(
+      { error: text || res.statusText },
+      { status: res.status }
+    )
+  }
   const data = await res.json();
   return NextResponse.json(data);
 }

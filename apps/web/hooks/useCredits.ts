@@ -1,5 +1,6 @@
 import useSWR, { mutate } from 'swr';
-import { supabase } from '../lib/supabase';
+import { createClient } from '../utils/supabase/client';
+import React from 'react';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -8,7 +9,7 @@ export function useCredits() {
     '/api/me/credits',
     fetcher
   );
-
+  const supabase = createClient()
   // Real-time updates via Supabase channel
   React.useEffect(() => {
     const channel = supabase

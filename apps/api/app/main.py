@@ -1,8 +1,10 @@
+# apps/api/app/main.py
 from fastapi import FastAPI
 from prometheus_fastapi_instrumentator import Instrumentator
 from app.db import database
 from app.api.v1 import auth, automations, credits, payments, webhook_make
-
+import logging
+logging.basicConfig(level=logging.INFO)
 app = FastAPI(title="Kibi API")
 
 @app.on_event("startup")
