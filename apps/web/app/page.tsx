@@ -7,6 +7,7 @@ import WorkflowLibrary from "@/components/Dashboard/WorkflowLibrary";
 import UserProfile from "@/components/Dashboard/UserProfile";
 import KibiAssistant from "@/components/Dashboard/KibiAssistant";
 import IndustryFilter from "@/components/Dashboard/IndustryFilter";
+import { useRouter } from "next/navigation";
 
 type UserData = {
   username: string,
@@ -24,6 +25,7 @@ const Index = () => {
   const [loading, setLoading] = useState(true)
   const [showAssistant, setShowAssistant] = useState(true);
   const [selectedIndustry, setSelectedIndustry] = useState('all');
+  const router = useRouter();
 
   useEffect(() => {
     const load = async () => {
@@ -38,7 +40,7 @@ const Index = () => {
   }, [])
 
   if (loading) return <div>Loading...</div>
-  if (!userData) return <div>Please sign in</div>
+  if (!userData) return router.push('/login');
 
   const handleIndustryChange = (industry: string) => {
     setSelectedIndustry(industry);

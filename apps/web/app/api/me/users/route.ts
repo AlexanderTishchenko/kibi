@@ -55,16 +55,18 @@ export async function POST(request: NextRequest) {
       .maybeSingle();
     console.log('[api/me/users] existing', existing)
     if (!existing) {
-    const { data: insertData, error: insertError } = await supabase
-      .from('profiles')
-      .insert([{ id: userid, username, avatar_url, credits, level, progress, total_time_saved, total_money_saved }])
-    if (insertError || !insertData) {
-      console.error('[api/me/users] POST insert error or no data', insertError)
-      return NextResponse.json({ message: insertError?.message || 'No data returned' }, { status: 500 })
+      const { status: insertStatus, statusText: insertStatusText, error: insertError } = await supabase
+        .from('profiles')
+        .insert([{ id: userid, username, avatar_url, credits, level, progress, total_time_saved, total_money_saved }])
+      if (insertError || insertStatusText !== "Created" || insertStatus !== 201) {
+        console.error('[api/me/users] POST insert error or no data. insertError:', insertError)
+        console.error('[api/me/users] POST insert status:', insertStatus)
+        return NextResponse.json({ message: insertError?.message || 'No data returned' }, { status: 500 })
+      }
+      console.log('[api/me/users] Profile created')
+      return NextResponse.json({ id: userid, username, avatar_url, credits, level, progress, total_time_saved, total_money_saved }, { status: 201 })
     }
-    console.log('[api/me/users] Profile created', insertData)
-    return NextResponse.json(insertData[0], { status: 201 })
-    }
+    return NextResponse.json({ message: 'Profile already exists' }, { status: 409 })
   } catch (err) {
     console.error('[api/me/users] Unexpected POST exception', err)
     return NextResponse.json({ message: 'Internal server error' }, { status: 500 })
@@ -83,17 +85,17 @@ export async function PATCH(request: NextRequest) {
     }
     const body = await request.json()
     console.log('[api/me/users] PATCH body', body)
-    const { data: updateData, error: updateError } = await supabase
+    const { status: updateStatus, statusText: updateStatusText, error: updateError } = await supabase
       .from('profiles')
       .update(body)
       .eq('id', user.id)
       .select()
-    if (updateError || !updateData) {
-      console.error('[api/me/users] PATCH update error or no data', updateError)
+    if (updateError || !updateStatus || updateStatus !== 200) {
+      console.error('[api/me/users] PATCH update error or no data. updateError:', updateError)
       return NextResponse.json({ message: updateError?.message || 'No data returned' }, { status: 500 })
     }
-    console.log('[api/me/users] Profile updated', updateData)
-    return NextResponse.json(updateData[0], { status: 200 })
+    console.log('[api/me/users] Profile updated')
+    return NextResponse.json({ id: user.id, ...body }, { status: 200 })
   } catch (err) {
     console.error('[api/me/users] Unexpected PATCH exception', err)
     return NextResponse.json({ message: 'Internal server error' }, { status: 500 })

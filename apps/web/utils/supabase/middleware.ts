@@ -39,7 +39,7 @@ export async function updateSession(request: NextRequest) {
   const {
     data: { user },
   } = await supabase.auth.getUser()
-  console.log('[updateSession] user from getUser():', user)
+  //console.log('[updateSession] user from getUser():', user)
 
   if (
     !user &&

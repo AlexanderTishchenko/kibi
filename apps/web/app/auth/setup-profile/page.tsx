@@ -1,5 +1,5 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 
@@ -7,8 +7,11 @@ export default function SetupProfile() {
   const router = useRouter();
   const params = useSearchParams();
   const next = params.get("next") ?? "/";
+  const hasRun = useRef(false);
 
   useEffect(() => {
+    if (hasRun.current) return;
+    hasRun.current = true;
     async function run() {
       console.log('[setup-profile] start setup-profile, next=', next);
       const supabase = await createClient();
@@ -63,7 +66,7 @@ export default function SetupProfile() {
       router.replace(next);
     }
     run();
-  }, [next, router]);
+  }, []);
 
   return <p>Setting up your profile…</p>;
 }
