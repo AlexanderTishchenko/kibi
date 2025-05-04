@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -10,20 +9,19 @@ import { Eye, EyeOff } from "lucide-react";
 interface WorkflowDetailFormProps {
   workflowId: string;
   onSubmit: (data: WorkflowFormData) => void;
+  registerSubmit?: (fn: () => void) => void;
 }
 
 export interface WorkflowFormData {
-  stripeApiKey: string;
   emailContent: string;
   frequency: string;
   emailAddress: string;
 }
 
-const WorkflowDetailForm: React.FC<WorkflowDetailFormProps> = ({ workflowId, onSubmit }) => {
+const WorkflowDetailForm: React.FC<WorkflowDetailFormProps> = ({ workflowId, onSubmit, registerSubmit }) => {
   const [showApiKey, setShowApiKey] = useState(false);
   const form = useForm<WorkflowFormData>({
     defaultValues: {
-      stripeApiKey: "",
       emailContent: "",
       frequency: "daily",
       emailAddress: "",
@@ -34,6 +32,12 @@ const WorkflowDetailForm: React.FC<WorkflowDetailFormProps> = ({ workflowId, onS
     console.log('Form submitted:', data);
     onSubmit(data);
   };
+
+  const submitFn = form.handleSubmit(handleSubmit);
+
+  useEffect(() => {
+    registerSubmit?.(submitFn);
+  }, [registerSubmit, submitFn]);
 
   return (
     <Form {...form}>
@@ -84,7 +88,7 @@ const WorkflowDetailForm: React.FC<WorkflowDetailFormProps> = ({ workflowId, onS
           )}
         />
 
-        <Button type="submit" className="w-full">Save Workflow Settings</Button>
+        <Button className="w-full">Save Workflow Settings</Button>
       </form>
     </Form>
   );

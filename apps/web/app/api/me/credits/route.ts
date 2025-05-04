@@ -29,3 +29,35 @@ export async function GET(req: NextRequest) {
   const data = await res.json()
   return NextResponse.json(data)
 }
+
+export async function PATCH(req: NextRequest) {
+  const supabase = await createClient();
+  const { data: { session }, error } = await supabase.auth.getSession();
+  if (error || !session) return NextResponse.json(
+    { error: 'Not authenticated' },
+    { status: 401 }
+  );
+
+  let apiBase = process.env.NEXT_PUBLIC_API_URL!;
+  if (apiBase.includes('localhost')) {
+    apiBase = apiBase.replace('localhost', 'api');
+  }
+  const body = await req.json();
+  const res = await fetch(`${apiBase}/v1/credits`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${session.access_token}`,
+    },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    return NextResponse.json(
+      { error: text || res.statusText },
+      { status: res.status }
+    );
+  }
+  const data = await res.json();
+  return NextResponse.json(data);
+}

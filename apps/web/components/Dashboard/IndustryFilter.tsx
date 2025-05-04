@@ -1,6 +1,5 @@
-
+//apps/web/components/Dashboard/IndustryFilter.tsx
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Building2, Home, Briefcase, Settings, CreditCard, TrendingUp } from 'lucide-react';
 

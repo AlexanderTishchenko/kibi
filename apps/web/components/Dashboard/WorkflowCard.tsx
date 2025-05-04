@@ -1,5 +1,6 @@
-
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
+import { useToast } from '@/components/ui/use-toast';
+import { useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -29,20 +30,52 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
   isInstalled = false,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const formSubmitRef = useRef<() => void>();
 
   const handleRunWorkflow = () => {
-    console.log(`Running workflow: ${id}`);
-    setIsExpanded(true);
+    if (!isExpanded) {
+      setIsExpanded(true);
+    } else {
+      formSubmitRef.current?.();
+    }
   };
 
   const handleInstallWorkflow = () => {
-    console.log(`Installing workflow: ${id}`);
     setIsExpanded(true);
   };
 
-  const handleFormSubmit = (data: WorkflowFormData) => {
-    console.log('Workflow settings saved:', data);
-    setIsExpanded(false);
+  const handleFormSubmit = async (data: WorkflowFormData) => {
+    setIsLoading(true);
+    try {
+      // Deduct credits via PATCH
+      const res = await fetch('/api/me/credits', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ deduct: creditsRequired }),
+      });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.error || 'Failed to deduct credits');
+
+      // Optionally: run workflow logic here
+      toast({
+        title: 'Workflow executed',
+        description: `Successfully deducted ${creditsRequired} credits.`,
+      });
+      // Refresh credits in UI
+      queryClient.invalidateQueries({ queryKey: ['credits'] });
+      setIsExpanded(false);
+    } catch (err: any) {
+      toast({
+        title: 'Error',
+        description: err.message || 'Failed to execute workflow',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -94,14 +127,18 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
 
         {isExpanded && (
           <div className="mt-4">
-            <WorkflowDetailForm workflowId={id} onSubmit={handleFormSubmit} />
+            <WorkflowDetailForm
+              workflowId={id}
+              onSubmit={handleFormSubmit}
+              registerSubmit={(fn) => (formSubmitRef.current = fn)}
+            />
           </div>
         )}
       </CardContent>
       <CardFooter className="pt-2 pb-4">
         <div className="w-full space-y-2">
           {isInstalled ? (
-            <Button
+            <Button type="submit"
               variant="default"
               className="w-full bg-kb-purple hover:bg-kb-purple/90"
               onClick={handleRunWorkflow}
